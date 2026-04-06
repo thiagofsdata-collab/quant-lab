@@ -1,0 +1,36 @@
+project:
+  name: quant-lab
+  version: "0.1.0"
+
+assets:
+  equities:
+    - PETR4.SA
+    - VALE3.SA
+    - ITUB4.SA
+    - BBDC4.SA
+    - WEGE3.SA
+  benchmarks:
+    - ^BVSP   # Ibovespa
+    - BRL=X   # USD/BRL
+
+data:
+  start_date: "2020-01-01"
+  end_date:   "2024-12-31"
+  interval:   "1d"          # 1d, 1wk, 1mo
+  source:     "yfinance"
+  raw_path:       "data/raw"
+  processed_path: "data/processed"
+
+transforms:
+  returns_window:     1      # days
+  volatility_window:  21     # rolling vol (1 month)
+  sma_windows:        [20, 50, 200]
+  rsi_window:         14
+
+backtest:
+  initial_capital:  100000   # BRL
+  commission:       0.0005   # 0.05% per trade
+  slippage:         0.0002
+
+logging:
+  level: INFO
