@@ -61,13 +61,13 @@ def run_backtest(df: pd.DataFrame, config: dict, signal_fn=None) -> dict:
 def compare_strategies(config: dict):
     from strategies.sma_crossover import generate_signals as signals_original
     from strategies.sma_crossover_filtered import generate_signals as signals_filtered
+    from strategies.bollinger_bands import generate_signals as bb
 
     proc_path = Path(config["data"]["processed_path"])
     equities  = [t.replace(".", "_") for t in config["assets"]["equities"]]
 
-    print(f"\n{'Ticker':<12} {'Orig%':>7} {'Filt%':>7} "
-          f"{'Orig Sharpe':>12} {'Filt Sharpe':>12} "
-          f"{'Orig DD':>8} {'Filt DD':>8}")
+    print(f"\n{'Ticker':<12} {'SMA%':>7} {'SMAf%':>7} {'BB%':>7} "
+          f"{'SMA Sh':>8} {'BB Sh':>8} {'SMA DD':>8} {'BB DD':>8}")
     print("-" * 75)
 
     for slug in equities:
@@ -79,10 +79,11 @@ def compare_strategies(config: dict):
 
         m1 = run_backtest(df, config, signal_fn=signals_original)["metrics"]
         m2 = run_backtest(df, config, signal_fn=signals_filtered)["metrics"]
+        m3 = run_backtest(df, config, signal_fn=bb)['metrics']
 
         print(f"{slug:<12} {m1['total_return']:>6}%  {m2['total_return']:>6}%  "
-              f"{m1['sharpe']:>11}  {m2['sharpe']:>11}  "
-              f"{m1['max_drawdown']:>7}%  {m2['max_drawdown']:>7}%")
+              f"{m3['total_return']:>11}  {m1['sharpe']:>7}  {m3['sharpe']:>7}"
+              f"{m1['max_drawdown']:>7}%  {m3['max_drawdown']:>7}%")
 
     print("\nDone.")
 
