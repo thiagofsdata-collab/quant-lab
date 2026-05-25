@@ -1,0 +1,13 @@
+# linguagem principal
+*.py linguist-language=Python
+
+# dados — não conta como código
+*.parquet linguist-documentation
+*.csv linguist-documentation
+
+# config — não conta como código
+*.yaml linguist-documentation
+*.yml linguist-documentation
+
+# força o repo a aparecer como Python no GitHub
+*.ipynb linguist-detectable=false
