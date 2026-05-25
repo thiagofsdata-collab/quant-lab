@@ -58,17 +58,18 @@ def run_backtest(df: pd.DataFrame, config: dict, signal_fn=None) -> dict:
     }
 
 
-def compare_strategies(config: dict):
-    from strategies.sma_crossover import generate_signals as signals_original
-    from strategies.sma_crossover_filtered import generate_signals as signals_filtered
+def compare_all_strategies(config: dict):
+    from strategies.sma_crossover import generate_signals as sma
+    from strategies.sma_crossover_filtered import generate_signals as sma_filtered
     from strategies.bollinger_bands import generate_signals as bb
+    from strategies.zscore_mean_reversion import generate_signals as zscore
 
     proc_path = Path(config["data"]["processed_path"])
-    equities  = [t.replace(".", "_") for t in config["assets"]["equities"]]
+    equities = [t.replace(".", "_") for t in config["assets"]["equities"]]
 
-    print(f"\n{'Ticker':<12} {'SMA%':>7} {'SMAf%':>7} {'BB%':>7} "
-          f"{'SMA Sh':>8} {'BB Sh':>8} {'SMA DD':>8} {'BB DD':>8}")
-    print("-" * 75)
+    print(f"\n{'Ticker':<12} {'SMA%':>7} {'SMAf%':>7} {'BB%':>7} {'ZScore%':>8} "
+          f"{'SMA Sh':>8} {'BB Sh':>8} {'ZS Sh':>8} {'SMA DD':>8} {'ZS DD':>8}")
+    print("-" * 90)
 
     for slug in equities:
         file = proc_path / f"{slug}_2020_2024.parquet"
@@ -77,20 +78,22 @@ def compare_strategies(config: dict):
 
         df = pd.read_parquet(file).sort_index()
 
-        m1 = run_backtest(df, config, signal_fn=signals_original)["metrics"]
-        m2 = run_backtest(df, config, signal_fn=signals_filtered)["metrics"]
-        m3 = run_backtest(df, config, signal_fn=bb)['metrics']
+        m1 = run_backtest(df, config, signal_fn=sma)["metrics"]
+        m2 = run_backtest(df, config, signal_fn=sma_filtered)["metrics"]
+        m3 = run_backtest(df, config, signal_fn=bb)["metrics"]
+        m4 = run_backtest(df, config, signal_fn=zscore)["metrics"]
 
         print(f"{slug:<12} {m1['total_return']:>6}%  {m2['total_return']:>6}%  "
-              f"{m3['total_return']:>11}  {m1['sharpe']:>7}  {m3['sharpe']:>7}"
-              f"{m1['max_drawdown']:>7}%  {m3['max_drawdown']:>7}%")
+              f"{m3['total_return']:>6}%  {m4['total_return']:>7}%  "
+              f"{m1['sharpe']:>7}  {m3['sharpe']:>7}  {m4['sharpe']:>7}  "
+              f"{m1['max_drawdown']:>7}%  {m4['max_drawdown']:>7}%")
 
     print("\nDone.")
 
 
 def run():
     config = load_config()
-    compare_strategies(config)
+    compare_all_strategies(config)
 
 
 if __name__ == "__main__":
