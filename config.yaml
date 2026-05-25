@@ -26,6 +26,9 @@ transforms:
   volatility_window: 21 # rolling vol (1 month)
   sma_windows: [20, 50, 200]
   rsi_window: 14
+  zscore_window: 20
+  zscore_entry: -1.5
+  zscore_exit: 1.5
 
 backtest:
   initial_capital: 100000 # BRL
