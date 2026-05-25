@@ -27,3 +27,6 @@ Thumbs.db
 # DuckDB
 *.duckdb
 *.duckdb.wal
+# plots
+notebooks/*.png
+*.png
